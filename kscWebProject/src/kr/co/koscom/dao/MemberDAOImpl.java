@@ -6,11 +6,13 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.co.koscom.common.MySqlDBUtil;
+import kr.co.koscom.common.DBUtil;
 import kr.co.koscom.dto.MemberDTO;
 
 public class MemberDAOImpl implements MemberDAO {
 
+	final String DBTYPE = "MYSQL";
+	//final String DBTYPE = "ORACLE";
 	@Override
 	public int addMember(MemberDTO member) {
 		Connection conn = null;
@@ -19,7 +21,7 @@ public class MemberDAOImpl implements MemberDAO {
 		int result = 0;		
 		
 		try {
-			conn = MySqlDBUtil.getConnect();
+			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			// id, name, email
 			ps.setString(1, member.getId());
@@ -31,7 +33,7 @@ public class MemberDAOImpl implements MemberDAO {
 			e.printStackTrace();
 			System.out.println("INSERT failed!!");
 		} finally {
-			MySqlDBUtil.close(conn, ps);
+			DBUtil.close(conn, ps);
 		}
 		return result;
 	}
@@ -44,7 +46,7 @@ public class MemberDAOImpl implements MemberDAO {
 		int result = 0;		
 		
 		try {
-			conn = MySqlDBUtil.getConnect();
+			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, id);
 			result = ps.executeUpdate();
@@ -52,7 +54,7 @@ public class MemberDAOImpl implements MemberDAO {
 			e.printStackTrace();
 			System.out.println("DELETE failed!!");
 		} finally {
-			MySqlDBUtil.close(conn, ps);
+			DBUtil.close(conn, ps);
 		}
 		return result;
 	}
@@ -67,7 +69,7 @@ public class MemberDAOImpl implements MemberDAO {
 		MemberDTO member = new MemberDTO();
 		
 		try {
-			conn = MySqlDBUtil.getConnect();
+			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, id);
 			rs = ps.executeQuery();
@@ -80,7 +82,7 @@ public class MemberDAOImpl implements MemberDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			MySqlDBUtil.close(conn, ps);
+			DBUtil.close(conn, ps);
 		}
 		return member;
 	}
@@ -94,7 +96,7 @@ public class MemberDAOImpl implements MemberDAO {
 		List<MemberDTO> memberList = new ArrayList<>();
 		String sql = "SELECT id, name, password, email FROM members";
 		try {
-			conn = MySqlDBUtil.getConnect();
+			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()) {
@@ -104,7 +106,7 @@ public class MemberDAOImpl implements MemberDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			MySqlDBUtil.close(conn, ps, rs);
+			DBUtil.close(conn, ps, rs);
 		}
 		return memberList;
 	}

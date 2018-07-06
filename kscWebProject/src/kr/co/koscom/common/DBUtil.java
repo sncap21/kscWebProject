@@ -6,17 +6,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MySqlDBUtil {
+public class DBUtil {
 
-	public static Connection getConnect() throws Exception{
-		String url = "jdbc:mysql://localhost:3306/test?serverTimezone=UTC";
+	public static Connection getConnect(String DBTYPE) throws Exception{
+		String url = null;
+		String driver = null;
+		Connection conn = null;
 		String user = "koscom";
 		String password = "koscom";
-		Connection conn = null;
-	
-		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-		conn = DriverManager.getConnection(url, user, password);
-		return conn;
+		// 드라이버로딩
+		switch (DBTYPE.toUpperCase()) {
+			case "ORACLE" : 
+				url = "jdbc:oracle:thin:@localhost:1521:xe";
+				driver = "oracle.jdbc.driver.OracleDriver";
+				Class.forName(driver);
+				conn = DriverManager.getConnection(url, user, password);
+				break;
+			case "MYSQL" :
+				url = "jdbc:mysql://localhost:3306/test?serverTimezone=UTC";
+				driver = "com.mysql.cj.jdbc.Driver";
+				Class.forName(driver).newInstance();
+				conn = DriverManager.getConnection(url, user, password);
+				break;
+			default : 
+				System.out.println(DBTYPE);
+				Exception e = new Exception("Unsupported DBTYPE ..");
+				throw e;
+		}
+		return conn;		
 	}
 
 	public static void close(Connection conn) {
