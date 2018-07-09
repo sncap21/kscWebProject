@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>ADD Member</title>
+<title>List Member</title>
 </head>
 <body>
 <h1> Member List</h1>
@@ -39,6 +39,8 @@
 <br>
 <form action = "Logout" method = "post">
 	<input type = "submit" value = "LOGOUT">
+<form action = "ShowBoard" method = "post">
+	<input type = "submit" value = "ShowBoard">
 </form>
 </body>
 </html>

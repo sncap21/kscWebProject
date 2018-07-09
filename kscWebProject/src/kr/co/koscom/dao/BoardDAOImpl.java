@@ -3,31 +3,27 @@ package kr.co.koscom.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
 
 import kr.co.koscom.common.DBUtil;
+import kr.co.koscom.dto.BoardDTO;
 import kr.co.koscom.dto.MemberDTO;
 
-public class MemberDAOImpl implements MemberDAO {
+public class BoardDAOImpl implements BoardDAO {
 
-	//final String DBTYPE = "MYSQL";
 	final String DBTYPE = "ORACLE";
 	@Override
-	public int addMember(MemberDTO member) {
+	public int addBoard(BoardDTO board) {
 		Connection conn = null;
 		PreparedStatement ps = null;
-		String sql = "INSERT INTO member value (?,?,?,?)";
+		String sql = "INSERT INTO board value (sequence._SEQ.NEXVAL,DATE.getCurrentDate(),?,?)";
 		int result = 0;		
 		
 		try {
 			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			// id, name, email
-			ps.setString(1, member.getId());
-			ps.setString(2, member.getName());
-			ps.setString(3, member.getPassword());
-			ps.setString(4, member.getEmail());
+			ps.setString(1, board.getId());
+			ps.setString(2, board.getContents());
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,16 +35,17 @@ public class MemberDAOImpl implements MemberDAO {
 	}
 
 	@Override
-	public int deleteMember(String id) {
+	public int deleteBoard(double sequence, String regDate) {
 		Connection conn = null;
 		PreparedStatement ps = null;
-		String sql = "DELETE member where id  = ?";
+		String sql = "DELETE member where regDate = ? and sequence = ?";
 		int result = 0;		
 		
 		try {
 			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, id);
+			ps.setDouble(1, sequence);
+			ps.setString(2, regDate);
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,56 +55,59 @@ public class MemberDAOImpl implements MemberDAO {
 		}
 		return result;
 	}
-	
+
 	@Override
-	public MemberDTO getMember(String id) {
+	public BoardDTO getBoard() {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		// id, name, email
-		String sql = "SELECT id, name, password, email FROM member where id =?";
-		MemberDTO member = new MemberDTO();
+		String sql = "SELECT sequence, reqdate, id, contents FROM board";
+		BoardDTO board = new BoardDTO();
 		
 		try {
 			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, id);
 			rs = ps.executeQuery();
 			if (rs.next()) {    // to prevent "before start of result set error"
-				member.setId(rs.getString(1)); 
-				member.setName(rs.getString(2));
-				member.setPassword(rs.getString(3));
-				member.setEmail(rs.getString(4));
+				board.setSequence(rs.getDouble(1)); 
+				board.setRegDate(rs.getString(2));
+				board.setId(rs.getString(3));
+				board.setContents(rs.getString(4));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(conn, ps);
 		}
-		return member;
+		return board;
 	}
 
 	@Override
-	public List<MemberDTO> getMemberList() {
+	public BoardDTO getBoardById(String id) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		MemberDTO member = null;
-		List<MemberDTO> memberList = new ArrayList<>();
-		String sql = "SELECT id, name, password, email FROM member";
+		// id, name, email
+		String sql = "SELECT sequence, reqdate, id, contents FROM board where id = ?";
+		BoardDTO board = new BoardDTO();
+		
 		try {
 			conn = DBUtil.getConnect(DBTYPE);
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
-			while(rs.next()) {
-				member = new MemberDTO(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4));
-				memberList.add(member);
+			ps.setString(1, id);
+			if (rs.next()) {    // to prevent "before start of result set error"
+				board.setSequence(rs.getDouble(1)); 
+				board.setRegDate(rs.getString(2));
+				board.setId(rs.getString(3));
+				board.setContents(rs.getString(4));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			DBUtil.close(conn, ps, rs);
+			DBUtil.close(conn, ps);
 		}
-		return memberList;
+		return board;
 	}
 }
